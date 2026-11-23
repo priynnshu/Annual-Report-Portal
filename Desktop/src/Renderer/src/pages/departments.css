@@ -1,0 +1,286 @@
+
+.departments-page {
+  width: 100%;
+}
+
+.departments-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.departments-heading h2 {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 25px;
+}
+
+.department-summary {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: fit-content;
+  min-width: 220px;
+  padding: 17px 20px;
+  margin-bottom: 20px;
+  background: #fff;
+  border: 1px solid #e9edf3;
+  border-radius: 10px;
+}
+
+.department-summary-icon,
+.department-table-icon {
+  display: grid;
+  place-items: center;
+  color: #4167e9;
+  background: #edf2ff;
+  border-radius: 9px;
+}
+
+.department-summary-icon {
+  width: 42px;
+  height: 42px;
+}
+
+.department-summary span,
+.department-summary strong {
+  display: block;
+}
+
+.department-summary span {
+  color: #8993a2;
+  font-size: 11px;
+}
+
+.department-summary strong {
+  margin-top: 4px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 22px;
+}
+
+.departments-table-panel {
+  padding: 21px;
+}
+
+.departments-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.departments-toolbar h3 {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 14px;
+}
+
+.departments-toolbar p {
+  margin: 5px 0 0;
+  color: #929cab;
+  font-size: 10px;
+}
+
+.department-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 230px;
+  padding: 10px;
+  border: 1px solid #e9edf3;
+  border-radius: 7px;
+  color: #9ba5b4;
+}
+
+.department-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: #273449;
+  background: transparent;
+  font-size: 11px;
+}
+
+.department-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #465267;
+  font-weight: 600;
+}
+
+.department-table-icon {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+.department-progress-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 100px;
+}
+
+.department-progress-cell .progress-track {
+  flex: 1;
+  min-width: 45px;
+}
+
+.department-progress-cell span {
+  color: #7d8999;
+  font-size: 10px;
+}
+
+.department-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.action-button {
+  width: 29px;
+  height: 29px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e8edf3;
+  border-radius: 6px;
+  background: white;
+}
+
+.edit-action {
+  color: #4167e9;
+}
+
+.delete-action {
+  color: #df6868;
+}
+
+.edit-action:hover {
+  background: #edf2ff;
+}
+
+.delete-action:hover {
+  background: #fff0f0;
+}
+
+.empty-departments {
+  padding: 35px;
+  text-align: center;
+  color: #929cab;
+}
+
+.department-modal-overlay {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: #17203377;
+}
+
+.department-modal {
+  width: min(100%, 460px);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 25px;
+  border-radius: 13px;
+  background: white;
+  box-shadow: 0 20px 60px #17203330;
+}
+
+.modal-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 23px;
+}
+
+.modal-heading h3 {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 17px;
+}
+
+.modal-heading p {
+  margin: 6px 0 0;
+  color: #929cab;
+  font-size: 11px;
+}
+
+.modal-close {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: #f5f6f9;
+  color: #7d8999;
+}
+
+.department-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.department-modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #465267;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.department-modal input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #e3e8ef;
+  border-radius: 7px;
+  outline: none;
+  color: #273449;
+  background: white;
+  font-size: 12px;
+}
+
+.department-modal input:focus {
+  border-color: #4167e9;
+  box-shadow: 0 0 0 3px #4167e918;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.cancel-button {
+  padding: 10px 15px;
+  border: 1px solid #e3e8ef;
+  border-radius: 7px;
+  background: white;
+  color: #647084;
+  font-size: 11px;
+}
+
+@media (max-width: 700px) {
+  .departments-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .departments-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .department-search {
+    width: 100%;
+  }
+}
