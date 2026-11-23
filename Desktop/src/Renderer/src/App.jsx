@@ -17,7 +17,7 @@ import {
   X,
 } from "lucide-react";
 
-import Departments from "./pages/Departments";
+import Departments from "./pages/departments";
 import "./App.css";
 
 const navigation = [

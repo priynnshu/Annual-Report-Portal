@@ -1,97 +1,176 @@
 
-import { useState } from "react";
-import { Plus, Search, Pencil, Trash2, X, Building2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  Plus,
+  Search,
+  Pencil,
+  Trash2,
+  X,
+  Building2,
+  Loader2,
+  RefreshCw,
+} from "lucide-react";
 import "./Departments.css";
 
-const initialDepartments = [
-  { id: 1, name: "Computer Science & AI", code: "CSAI", head: "Dr. Sharma", total: 20, submitted: 18 },
-  { id: 2, name: "Management", code: "MGT", head: "Dr. Mehta", total: 18, submitted: 14 },
-  { id: 3, name: "Design", code: "DSN", head: "Dr. Kapoor", total: 15, submitted: 12 },
-  { id: 4, name: "Law", code: "LAW", head: "Dr. Verma", total: 15, submitted: 9 },
-];
+const API_URL = "http://localhost:4000/api/departments";
 
-const emptyForm = { name: "", code: "", head: "", total: 0 };
+const emptyForm = {
+  name: "",
+  code: "",
+  head: "",
+  total: 0,
+};
 
 function Departments() {
-  const [departments, setDepartments] = useState(initialDepartments);
+  const [departments, setDepartments] = useState([]);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(emptyForm);
 
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  // Fetch departments from PostgreSQL through Express
+  async function fetchDepartments() {
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await fetch(API_URL);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch departments.");
+      }
+
+      const data = await response.json();
+      setDepartments(data);
+    } catch (err) {
+      console.error(err);
+      setError("Unable to load departments. Check your backend connection.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+  // Search departments
   const filteredDepartments = departments.filter((department) =>
     `${department.name} ${department.code} ${department.head}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
 
+  // Open add form
   function openAddForm() {
     setEditingId(null);
     setForm(emptyForm);
     setShowForm(true);
+    setError("");
   }
 
+  // Open edit form
   function openEditForm(department) {
     setEditingId(department.id);
+
     setForm({
       name: department.name,
       code: department.code,
       head: department.head,
       total: department.total,
     });
+
     setShowForm(true);
+    setError("");
   }
 
-  function handleSubmit(event) {
+  // Add or update department
+  async function handleSubmit(event) {
     event.preventDefault();
 
-    const cleanForm = {
-      name: form.name.trim(),
-      code: form.code.trim().toUpperCase(),
-      head: form.head.trim(),
-      total: Math.max(0, Number(form.total) || 0),
-    };
+    try {
+      setSaving(true);
+      setError("");
 
-    if (!cleanForm.name || !cleanForm.code || !cleanForm.head) {
-      return;
-    }
+      const payload = {
+        name: form.name.trim(),
+        code: form.code.trim().toUpperCase(),
+        head: form.head.trim(),
+        total: Number(form.total),
+      };
 
-    if (editingId !== null) {
-      setDepartments((current) =>
-        current.map((department) =>
-          department.id === editingId
-            ? { ...department, ...cleanForm }
-            : department
-        )
-      );
-    } else {
-      setDepartments((current) => [
-        ...current,
-        {
-          id: Date.now(),
-          ...cleanForm,
-          submitted: 0,
+      if (
+        !payload.name ||
+        !payload.code ||
+        !payload.head ||
+        !Number.isInteger(payload.total) ||
+        payload.total < 0
+      ) {
+        throw new Error("Please enter valid department details.");
+      }
+
+      const url = editingId
+        ? `${API_URL}/${editingId}`
+        : API_URL;
+
+      const response = await fetch(url, {
+        method: editingId ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ]);
-    }
+        body: JSON.stringify(payload),
+      });
 
-    setShowForm(false);
-    setEditingId(null);
-    setForm(emptyForm);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to save department.");
+      }
+
+      setShowForm(false);
+      setEditingId(null);
+      setForm(emptyForm);
+
+      await fetchDepartments();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function deleteDepartment(id) {
+  // Delete department
+  async function deleteDepartment(id) {
     const department = departments.find((item) => item.id === id);
+
     if (!department) return;
 
     const confirmed = window.confirm(
-      `Delete the ${department.name} department?`
+      `Are you sure you want to delete ${department.name}?`
     );
 
-    if (confirmed) {
-      setDepartments((current) =>
-        current.filter((item) => item.id !== id)
-      );
+    if (!confirmed) return;
+
+    try {
+      setError("");
+
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to delete department.");
+      }
+
+      await fetchDepartments();
+    } catch (err) {
+      setError(err.message);
     }
   }
 
@@ -116,6 +195,7 @@ function Departments() {
         <div className="department-summary-icon">
           <Building2 size={22} />
         </div>
+
         <div>
           <span>Total Departments</span>
           <strong>{departments.length}</strong>
@@ -131,92 +211,125 @@ function Departments() {
 
           <div className="department-search">
             <Search size={17} />
+
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search departments..."
             />
+
+            <button
+              className="refresh-button"
+              onClick={fetchDepartments}
+              title="Refresh departments"
+              aria-label="Refresh departments"
+            >
+              <RefreshCw size={15} />
+            </button>
           </div>
         </div>
 
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Department</th>
-                <th>Code</th>
-                <th>Department Head</th>
-                <th>Reports</th>
-                <th>Progress</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
+        {error && !showForm && (
+          <div className="department-error">
+            {error}
+          </div>
+        )}
 
-            <tbody>
-              {filteredDepartments.map((department) => {
-                const percentage =
-                  department.total > 0
-                    ? Math.round(
-                        (department.submitted / department.total) * 100
-                      )
-                    : 0;
+        {loading ? (
+          <div className="department-loading">
+            <Loader2 className="loading-spinner" size={24} />
+            <p>Loading departments...</p>
+          </div>
+        ) : (
+          <div className="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Department</th>
+                  <th>Code</th>
+                  <th>Department Head</th>
+                  <th>Reports</th>
+                  <th>Progress</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
 
-                return (
-                  <tr key={department.id}>
-                    <td className="department-name-cell">
-                      <div className="department-table-icon">
-                        <Building2 size={17} />
-                      </div>
-                      {department.name}
-                    </td>
-                    <td>{department.code}</td>
-                    <td>{department.head}</td>
-                    <td>
-                      {department.submitted}/{department.total}
-                    </td>
-                    <td>
-                      <div className="department-progress-cell">
-                        <div className="progress-track">
-                          <div
-                            className="progress-fill blue"
-                            style={{ width: `${percentage}%` }}
-                          />
+              <tbody>
+                {filteredDepartments.map((department) => {
+                  const percentage =
+                    department.total > 0
+                      ? Math.round(
+                          (department.submitted / department.total) * 100
+                        )
+                      : 0;
+
+                  return (
+                    <tr key={department.id}>
+                      <td className="department-name-cell">
+                        <div className="department-table-icon">
+                          <Building2 size={17} />
                         </div>
-                        <span>{percentage}%</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="department-actions">
-                        <button
-                          className="action-button edit-action"
-                          title="Edit department"
-                          onClick={() => openEditForm(department)}
-                        >
-                          <Pencil size={15} />
-                        </button>
-                        <button
-                          className="action-button delete-action"
-                          title="Delete department"
-                          onClick={() => deleteDepartment(department.id)}
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
+                        {department.name}
+                      </td>
+
+                      <td>{department.code}</td>
+                      <td>{department.head}</td>
+
+                      <td>
+                        {department.submitted}/{department.total}
+                      </td>
+
+                      <td>
+                        <div className="department-progress-cell">
+                          <div className="progress-track">
+                            <div
+                              className="progress-fill blue"
+                              style={{
+                                width: `${Math.min(percentage, 100)}%`,
+                              }}
+                            />
+                          </div>
+
+                          <span>{percentage}%</span>
+                        </div>
+                      </td>
+
+                      <td>
+                        <div className="department-actions">
+                          <button
+                            className="action-button edit-action"
+                            title="Edit department"
+                            onClick={() => openEditForm(department)}
+                          >
+                            <Pencil size={15} />
+                          </button>
+
+                          <button
+                            className="action-button delete-action"
+                            title="Delete department"
+                            onClick={() => deleteDepartment(department.id)}
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+
+                {filteredDepartments.length === 0 && (
+                  <tr>
+                    <td colSpan="6" className="empty-departments">
+                      {search
+                        ? "No matching departments found."
+                        : "No departments available. Add your first department."}
                     </td>
                   </tr>
-                );
-              })}
-
-              {filteredDepartments.length === 0 && (
-                <tr>
-                  <td colSpan="6" className="empty-departments">
-                    No departments found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       {showForm && (
@@ -224,11 +337,12 @@ function Departments() {
           <div className="department-modal">
             <div className="modal-heading">
               <div>
-                <h3>{editingId ? "Edit Department" : "Add Department"}</h3>
+                <h3>
+                  {editingId ? "Edit Department" : "Add Department"}
+                </h3>
+
                 <p>
-                  {editingId
-                    ? "Update the department details."
-                    : "Enter the details of the new department."}
+                  Enter the department information below.
                 </p>
               </div>
 
@@ -242,6 +356,12 @@ function Departments() {
             </div>
 
             <form onSubmit={handleSubmit}>
+              {error && (
+                <div className="department-error">
+                  {error}
+                </div>
+              )}
+
               <label>
                 Department Name
                 <input
@@ -283,6 +403,8 @@ function Departments() {
                 <input
                   type="number"
                   min="0"
+                  step="1"
+                  required
                   value={form.total}
                   onChange={(event) =>
                     setForm({ ...form, total: event.target.value })
@@ -294,12 +416,30 @@ function Departments() {
                 <button
                   type="button"
                   className="cancel-button"
-                  onClick={() => setShowForm(false)}
+                  onClick={() => {
+                    setShowForm(false);
+                    setError("");
+                  }}
+                  disabled={saving}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="primary-button">
-                  {editingId ? "Save Changes" : "Add Department"}
+
+                <button
+                  type="submit"
+                  className="primary-button"
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 size={15} className="loading-spinner" />
+                      Saving...
+                    </>
+                  ) : editingId ? (
+                    "Save Changes"
+                  ) : (
+                    "Add Department"
+                  )}
                 </button>
               </div>
             </form>
