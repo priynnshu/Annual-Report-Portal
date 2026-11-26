@@ -9,6 +9,8 @@ datasource db {
 }
 
 model Department {
+  reports AnnualReport[]
+
   id        String   @id @default(uuid())
   name      String
   code      String   @unique
@@ -17,4 +19,31 @@ model Department {
   submitted Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+
+
+enum ReportStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+model AnnualReport {
+  id           String       @id @default(uuid())
+  rejectionReason String?
+  title        String
+  category     String
+  academicYear String
+  description  String?
+  status       ReportStatus @default(DRAFT)
+
+  departmentId String
+  department   Department   @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  submittedAt  DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }

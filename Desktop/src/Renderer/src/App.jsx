@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 
 import Departments from "./pages/departments";
+import Reports from "./pages/reports";
+import Review from "./pages/review";
 import "./App.css";
 
 const navigation = [
@@ -28,63 +30,15 @@ const navigation = [
   { name: "Report Builder", icon: BarChart3 },
 ];
 
-const departments = [
-  { name: "Computer Science & AI", submitted: 18, total: 20, color: "blue" },
-  { name: "Management", submitted: 14, total: 18, color: "purple" },
-  { name: "Design", submitted: 12, total: 15, color: "orange" },
-  { name: "Law", submitted: 9, total: 15, color: "green" },
-];
 
-const submissions = [
-  {
-    department: "Computer Science & AI",
-    title: "Annual Department Report 2025–26",
-    date: "Today, 10:30 AM",
-    status: "Submitted",
-  },
-  {
-    department: "Management",
-    title: "Faculty Development Report",
-    date: "Yesterday, 3:45 PM",
-    status: "Under Review",
-  },
-  {
-    department: "Design",
-    title: "Student Activities Report",
-    date: "20 Nov 2026",
-    status: "Approved",
-  },
-  {
-    department: "Law",
-    title: "Research & Publications Report",
-    date: "19 Nov 2026",
-    status: "Submitted",
-  },
-];
-
-const approvals = [
-  {
-    department: "Management",
-    title: "Faculty Development Report",
-    submitted: "21 Nov 2026",
-  },
-  {
-    department: "Law",
-    title: "Research & Publications Report",
-    submitted: "19 Nov 2026",
-  },
-  {
-    department: "Design",
-    title: "Department Activities Report",
-    submitted: "18 Nov 2026",
-  },
-];
 
 function App() {
   const [status, setStatus] = useState("Connecting...");
   const [backendMessage, setBackendMessage] = useState("");
   const [activePage, setActivePage] = useState("Dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [dashboardDepartments, setDashboardDepartments] = useState([]);
+const [dashboardReports, setDashboardReports] = useState([]);
 
   // Backend health check
   useEffect(() => {
@@ -125,37 +79,124 @@ function App() {
       clearInterval(interval);
     };
   }, []);
+  // Fetch live dashboard data
+useEffect(() => {
+  let mounted = true;
 
-  const stats = [
-    {
-      label: "Total Departments",
-      value: "12",
-      note: "Registered departments",
-      icon: Building2,
-      color: "blue",
-    },
-    {
-      label: "Reports Submitted",
-      value: "53",
-      note: "Across all departments",
-      icon: FileText,
-      color: "purple",
-    },
-    {
-      label: "Pending Reviews",
-      value: "08",
-      note: "Awaiting approval",
-      icon: Clock3,
-      color: "orange",
-    },
-    {
-      label: "Reports Approved",
-      value: "45",
-      note: "Successfully reviewed",
-      icon: CheckCircle2,
-      color: "green",
-    },
-  ];
+  async function fetchDashboardData() {
+    try {
+      const [departmentResponse, reportResponse] = await Promise.all([
+        fetch("http://localhost:4000/api/departments"),
+        fetch("http://localhost:4000/api/reports"),
+      ]);
+
+      if (!departmentResponse.ok || !reportResponse.ok) {
+        throw new Error("Failed to fetch dashboard data");
+      }
+
+      const [departmentData, reportData] = await Promise.all([
+        departmentResponse.json(),
+        reportResponse.json(),
+      ]);
+
+      if (mounted) {
+        setDashboardDepartments(departmentData);
+        setDashboardReports(reportData);
+      }
+    } catch (error) {
+      console.error("Dashboard data error:", error);
+    }
+  }
+
+  fetchDashboardData();
+
+  const interval = setInterval(fetchDashboardData, 30000);
+
+  return () => {
+    mounted = false;
+    clearInterval(interval);
+  };
+}, []);
+
+  const submittedReports = dashboardReports.filter(
+  (report) => report.submittedAt !== null
+);
+
+const pendingReports = dashboardReports.filter(
+  (report) =>
+    report.status === "SUBMITTED" ||
+    report.status === "UNDER_REVIEW"
+);
+
+const approvedReports = dashboardReports.filter(
+  (report) => report.status === "APPROVED"
+);
+  const departmentColors = ["blue", "purple", "orange", "green"];
+
+const departments = dashboardDepartments.map((department, index) => {
+  const submittedCount = dashboardReports.filter(
+    (report) =>
+      report.departmentId === department.id &&
+      report.submittedAt !== null
+  ).length;
+
+  return {
+    ...department,
+    submitted: submittedCount,
+    color: departmentColors[index % departmentColors.length],
+  };
+});
+
+const approvals = pendingReports.map((report) => ({
+  title: report.title,
+  department: report.department?.name || "Unknown Department",
+  submitted: report.submittedAt
+    ? new Date(report.submittedAt).toLocaleDateString()
+    : "Not submitted",
+}));
+
+const submissions = [...submittedReports]
+  .sort(
+    (a, b) =>
+      new Date(b.submittedAt) - new Date(a.submittedAt)
+  )
+  .slice(0, 5)
+  .map((report) => ({
+    title: report.title,
+    department: report.department?.name || "Unknown Department",
+    date: new Date(report.submittedAt).toLocaleString(),
+    status: report.status.replaceAll("_", " "),
+  }));
+const stats = [
+  {
+    label: "Total Departments",
+    value: dashboardDepartments.length,
+    note: "Registered departments",
+    icon: Building2,
+    color: "blue",
+  },
+  {
+    label: "Reports Submitted",
+    value: submittedReports.length,
+    note: "Across all departments",
+    icon: FileText,
+    color: "purple",
+  },
+  {
+    label: "Pending Reviews",
+    value: pendingReports.length,
+    note: "Awaiting approval",
+    icon: Clock3,
+    color: "orange",
+  },
+  {
+    label: "Reports Approved",
+    value: approvedReports.length,
+    note: "Successfully reviewed",
+    icon: CheckCircle2,
+    color: "green",
+  },
+];
 
   // Page rendering
   function renderPage() {
@@ -163,6 +204,13 @@ function App() {
     if (activePage === "Departments") {
       return <Departments />;
     }
+    // Annual Reports page
+if (activePage === "Annual Reports") {
+  return <Reports />;
+}
+if (activePage === "Review & Approval") {
+  return <Review />;
+}
 
     // Other pages are placeholders for now
     if (activePage !== "Dashboard") {

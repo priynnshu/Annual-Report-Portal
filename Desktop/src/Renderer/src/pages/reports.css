@@ -1,0 +1,387 @@
+
+.reports-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.reports-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.reports-heading h2 {
+  margin: 5px 0;
+  font-size: 27px;
+}
+
+.reports-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.report-summary-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  background: white;
+  border: 1px solid #e8ebf0;
+  border-radius: 12px;
+  color: #64748b;
+}
+
+.report-summary-card span {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.report-summary-card strong {
+  display: block;
+  font-size: 23px;
+  color: #172033;
+}
+
+.summary-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.draft-dot {
+  background: #94a3b8;
+}
+
+.submitted-dot {
+  background: #3b82f6;
+}
+
+.approved-dot {
+  background: #16a34a;
+}
+
+.reports-panel {
+  padding: 22px;
+}
+
+.reports-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.reports-toolbar h3 {
+  margin: 0 0 5px;
+}
+
+.reports-toolbar p {
+  margin: 0;
+  color: #8791a3;
+  font-size: 13px;
+}
+
+.reports-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reports-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #e2e6ed;
+  padding: 0 11px;
+  border-radius: 8px;
+  height: 39px;
+  color: #8791a3;
+}
+
+.reports-search input {
+  width: 170px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+}
+
+.reports-controls select,
+.report-modal select {
+  border: 1px solid #e2e6ed;
+  border-radius: 8px;
+  padding: 10px;
+  background: white;
+  color: #334155;
+  outline: none;
+}
+
+.refresh-button {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #e2e6ed;
+  border-radius: 8px;
+  background: white;
+  color: #64748b;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.refresh-button:hover {
+  background: #f1f5f9;
+}
+
+.reports-loading {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.reports-error {
+  padding: 12px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  background: #fff1f2;
+  color: #be123c;
+  font-size: 13px;
+}
+
+.report-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #263247;
+}
+
+.report-file-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.report-status {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.report-status.draft {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.report-status.submitted {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.report-status.under-review {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.report-status.approved {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.report-status.rejected {
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.report-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.report-action {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #f1f5f9;
+}
+
+.edit-report {
+  color: #2563eb;
+}
+
+.submit-report {
+  color: #15803d;
+}
+
+.delete-report {
+  color: #dc2626;
+}
+
+.report-action:hover {
+  filter: brightness(0.95);
+}
+
+.locked-report {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.empty-reports {
+  padding: 35px !important;
+  text-align: center;
+  color: #8791a3;
+}
+
+.report-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.report-modal {
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 14px;
+  padding: 25px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+.report-modal-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+
+.report-modal-heading h3 {
+  margin: 0 0 5px;
+  font-size: 20px;
+}
+
+.report-modal-heading p {
+  margin: 0;
+  font-size: 13px;
+  color: #8791a3;
+}
+
+.report-modal-close {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.report-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.report-modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.report-modal input,
+.report-modal textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid #dfe4ec;
+  border-radius: 8px;
+  outline: none;
+  font: inherit;
+  font-weight: 400;
+  color: #263247;
+  resize: vertical;
+}
+
+.report-modal input:focus,
+.report-modal textarea:focus,
+.report-modal select:focus {
+  border-color: #3b82f6;
+}
+
+.report-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.report-modal-actions button {
+  min-height: 39px;
+}
+
+@media (max-width: 1000px) {
+  .reports-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reports-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .reports-controls {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .reports-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .reports-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .reports-search {
+    flex: 1;
+  }
+
+  .reports-search input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .reports-panel {
+    padding: 14px;
+  }
+}

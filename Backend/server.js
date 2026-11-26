@@ -1,6 +1,7 @@
 
 const express = require("express");
 const cors = require("cors");
+const reportRoutes = require("./routes/reportRoutes");
 require("dotenv").config();
 
 const departmentRoutes = require("./routes/departmentRoutes");
@@ -28,6 +29,7 @@ app.get("/api/health", (req, res) => {
 
 // Department APIs
 app.use("/api/departments", departmentRoutes);
+app.use("/api/reports", reportRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
